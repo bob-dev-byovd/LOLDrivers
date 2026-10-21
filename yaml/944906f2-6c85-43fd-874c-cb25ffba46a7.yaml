@@ -1,0 +1,47 @@
+Id: 944906f2-6c85-43fd-874c-cb25ffba46a7
+Tags:
+- aswbidsh.sys
+Verified: 'TRUE'
+Author: caterpii
+Created: '2026-10-21'
+MitreID: T1562.001
+Category: vulnerable driver
+
+Commands:
+  Command: 'sc.exe create aswbidsh binPath=C:\Windows\Temp\aswbidsh.sys type=kernel && sc.exe start aswbidsh'
+  Description: >-
+    Gen Digital's Microsoft-signed aswbidsh.sys exposes process-control
+    operations through IOCTL 0x5356E404 on \\.\AvAswIDSErHr. An
+    Administrator or LocalSystem caller can submit a 0x20-byte request with
+    command 2, operation 1, a caller-selected PID, and process_identity 0.
+    Static analysis confirms that the direct PID path opens the target with
+    ZwOpenProcess and calls ZwTerminateProcess. Setting flags bit 0 first
+    clears ProcessBreakOnTermination. Dynamic validation confirmed termination
+    of a harmless caller-selected process. The device is restricted to
+    Administrators and LocalSystem, so this is not a low-privilege LPE, but it
+    is usable as a BYOVD/EDR-killer primitive after administrator execution.
+    The same dispatcher also exposes process suspension and critical-process
+    flag clearing.
+  Usecase: >-
+    Terminate or suspend caller-selected processes from kernel mode to impair
+    security tools.
+  Privileges: >-
+    Administrator or LocalSystem access is required; administrator privileges
+    are also required to install and load the driver.
+  OperatingSystem: Windows 10 and Windows 11 x64
+
+Resources:
+- https://www.virustotal.com/gui/file/3e36d405bd81b384a70db36c6b8847b849faea53482c4f028378a0fae0d8e1de
+- https://files.avast.com/iavs9x/avast_free_antivirus_setup_offline.exe
+
+Acknowledgement:
+  Person: caterpii
+  Handle: '@caterpii'
+
+Detection: []
+
+KnownVulnerableSamples:
+- Filename: aswbidsh.sys
+  MD5: 39dc550cfa744ee9c9dda8dcc8debc55
+  SHA1: 8374e992ddcc060189234d16907f188fb12b55fe
+  SHA256: 3e36d405bd81b384a70db36c6b8847b849faea53482c4f028378a0fae0d8e1de
